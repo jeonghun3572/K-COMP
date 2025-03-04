@@ -51,8 +51,8 @@ bash 3_inference.sh
 
 ## Acknowledgement
 This repo is partially based upon the following repos:
-* Unsupervised Dense Information Retrieval with Contrastive Learning [[repo](https://github.com/facebookresearch/contrieve)]
-* KILM: Knowledge Injection into Encoder-Decoder Language Models [[repo](https://github.com/alexa/kilm)]
-* TRL - Transformer Reinforcement Learning [[repo](https://github.com/huggingface/trl)]
+* Unsupervised Dense Information Retrieval with Contrastive Learning [[github](https://github.com/facebookresearch/contrieve)]
+* KILM: Knowledge Injection into Encoder-Decoder Language Models [[github](https://github.com/alexa/kilm)]
+* TRL - Transformer Reinforcement Learning [[github](https://github.com/huggingface/trl)]
 
 Thanks for their wonderful work.
