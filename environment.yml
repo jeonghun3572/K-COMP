@@ -150,4 +150,4 @@ dependencies:
       - wrapt==1.17.2
       - xxhash==3.5.0
       - yarl==1.18.3
-prefix: /home/jeonghuncho/anaconda3/envs/kcomp
+prefix: /home/anaconda3/envs/kcomp
