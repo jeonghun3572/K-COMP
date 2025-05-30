@@ -3,7 +3,7 @@
 
 This is the official implementation of the following paper:
 
-> **K-COMP: Retrieval-Augmented Medical Domain Question Answering With Knowledge-Injected Compressor** [[Paper](https://arxiv.org/abs/2501.13567)]
+> **K-COMP: Retrieval-Augmented Medical Domain Question Answering With Knowledge-Injected Compressor** [[paper](https://arxiv.org/abs/2501.13567)]
 
 <p align="center"><img src="figs/main.png" style="width: 70%; height: auto;"></p>
 <p align="center">The overview of K-COMP.</p>
@@ -15,8 +15,8 @@ conda env create -f environment.yml
 
 ## Data Collection
 Download the datasets:
-* A Question-Entailment Approach to Question Answering (MedQuAD) [[gihub](https://github.com/abachaa/MedQuAD)]
-* Question Answering with Long Multiple-Span Answers (MASH-QA) [[gihub](https://github.com/mingzhu0527/MASHQA)]
+* A Question-Entailment Approach to Question Answering (MedQuAD) [[github](https://github.com/abachaa/MedQuAD)]
+* Question Answering with Long Multiple-Span Answers (MASH-QA) [[github](https://github.com/mingzhu0527/MASHQA)]
 * BioASQ-QA: A manually curated corpus for Biomedical Question Answering (BioASQ) [[website](https://participants-area.bioasq.org/datasets/)]
 
 Download the retrieval corpus:
