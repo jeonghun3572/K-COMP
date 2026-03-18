@@ -1,5 +1,4 @@
-<h1 align="center">K-COMP</h1>
-<h3 align="center">Retrieval-Augmented Medical Domain Question Answering<br>With Knowledge-Injected Compressor</h3>
+<h1 align="center">K-COMP: Retrieval-Augmented Medical Domain Question Answering With Knowledge-Injected Compressor</h1>
 
 <p align="center">
   <a href="https://arxiv.org/abs/2501.13567"><img src="https://img.shields.io/badge/arXiv-2501.13567-b31b1b.svg" alt="arXiv"></a>
@@ -98,11 +97,14 @@ bash scripts/run_inference.sh
 ## Citation
 
 ```bibtex
-@article{cho2025k,
-  title={K-COMP: Retrieval-Augmented Medical Domain Question Answering With Knowledge-Injected Compressor},
-  author={Cho, Jeonghun and Lee, Gary Geunbae},
-  journal={arXiv preprint arXiv:2501.13567},
-  year={2025}
+@misc{cho2025kcompretrievalaugmentedmedicaldomain,
+      title={K-COMP: Retrieval-Augmented Medical Domain Question Answering With Knowledge-Injected Compressor}, 
+      author={Jeonghun Cho and Gary Geunbae Lee},
+      year={2025},
+      eprint={2501.13567},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2501.13567}, 
 }
 ```
 
