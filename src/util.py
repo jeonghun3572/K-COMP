@@ -173,7 +173,7 @@ class WikiPageProcessor:
         for l in text.splitlines():
             line = l.strip()
             for ex in exclude_sections:
-                pat = re.compile("=+\s*" + ex + "\s*=+")
+                pat = re.compile(r"=+\s*" + ex + r"\s*=+")
                 if re.match(pat, line.lower()):
                     skip = True  # replace with break if this is the last section
                     continue
@@ -188,7 +188,7 @@ class WikiPageProcessor:
         """
         Remove the patter [[abc:xyz]]
         """
-        pat = "\[\[(.*?):(.*?)]]"
+        pat = r"\[\[(.*?):(.*?)]]"
         text = re.sub(pat, '', str(text))
         return text
 
@@ -197,7 +197,7 @@ class WikiPageProcessor:
         """
         Remove everything inside {} and <>
         """
-        pat_lt_gt = re.compile("&lt;\s*(.*?)\s*&gt;")
+        pat_lt_gt = re.compile(r"&lt;\s*(.*?)\s*&gt;")
         text = re.sub(pat_lt_gt, "", text)
 
         out = ''
@@ -224,7 +224,7 @@ class WikiPageProcessor:
                 i += 1
 
         # Remove "[http:xyz.com link to the address]"
-        link_pat = re.compile("\[\s*http(.*?):(.*?)]")
+        link_pat = re.compile(r"\[\s*http(.*?):(.*?)]")
         out = re.sub(link_pat, "", out)
         return out
 

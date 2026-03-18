@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Experiment outputs
+result/
+checkpoint/
+wandb/
+*.log
+
+# Embeddings & index (large binary files)
+*.pkl
+*.faiss
+*_embeddings/
+
+# Jupyter
+.ipynb_checkpoints/

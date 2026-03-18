@@ -1,0 +1,25 @@
+torch>=2.4.0
+transformers>=4.49.0
+accelerate>=1.4.0
+trl>=0.15.0
+datasets>=3.3.0
+flash-attn>=2.7.0
+faiss-cpu>=1.9.0
+sentencepiece>=0.2.0
+tokenizers>=0.21.0
+
+# Data processing
+spacy>=3.8.0
+nltk>=3.9.0
+textblob>=0.19.0
+mwparserfromhell>=0.6.0
+wikimapper>=0.2.0
+pyarrow>=19.0.0
+pandas>=2.2.0
+parmap>=1.7.0
+
+# API
+openai>=1.60.0
+
+# Logging
+wandb>=0.18.0

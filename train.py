@@ -1,5 +1,6 @@
 import os
 import argparse
+
 import torch
 import wandb
 from datasets import load_dataset
@@ -7,8 +8,13 @@ from accelerate import PartialState
 from trl import SFTTrainer, SFTConfig
 from transformers import AutoTokenizer, AutoModelForCausalLM, EarlyStoppingCallback
 
+
 def formatting_prompts_func(example):
-    return [f"{prompt.strip()}\n\n{completion.strip()}" for prompt, completion in zip(example['prompt'], example['completion'])]
+    return [
+        f"{prompt.strip()}\n\n{completion.strip()}"
+        for prompt, completion in zip(example["prompt"], example["completion"])
+    ]
+
 
 def main(args):
     torch.manual_seed(args.seed)
@@ -26,11 +32,11 @@ def main(args):
         args.model_id,
         torch_dtype=torch.bfloat16,
         attn_implementation="flash_attention_2",
-        device_map={'': device_string},
+        device_map={"": device_string},
         trust_remote_code=True,
     )
 
-    special_tokens_dict = {'additional_special_tokens': ['<ent>', '<eod>']}
+    special_tokens_dict = {"additional_special_tokens": ["<ent>", "<eod>"]}
     tokenizer.add_special_tokens(special_tokens_dict)
     model.resize_token_embeddings(len(tokenizer))
 
@@ -57,7 +63,7 @@ def main(args):
         save_total_limit=1,
         load_best_model_at_end=True,
         gradient_checkpointing=True,
-        gradient_checkpointing_kwargs={'use_reentrant': False},
+        gradient_checkpointing_kwargs={"use_reentrant": False},
         run_name=args.wandb_run_name,
         report_to="wandb",
         save_only_model=True,
@@ -79,22 +85,23 @@ def main(args):
     trainer.model.save_pretrained(args.output_dir)
     wandb.finish()
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Train a model.")
-    parser.add_argument('--train_data', type=str, required=True, help="Path to the training data.")
-    parser.add_argument('--eval_data', type=str, required=True, help="Path to the evaluation data.")
-    parser.add_argument('--output_dir', type=str, required=True, help="Path to the output directory.")
-    parser.add_argument('--model_id', type=str, required=True, help="Model ID.")
-    parser.add_argument('--per_device_train_batch_size', type=int, default=1, help="Batch size per device for training.")
-    parser.add_argument('--per_device_eval_batch_size', type=int, default=1, help="Batch size per device for evaluation.")
-    parser.add_argument('--learning_rate', type=float, default=5e-5, help="Learning rate.")
-    parser.add_argument('--lr_scheduler_type', type=str, default="linear", help="Learning rate scheduler type.")
-    parser.add_argument('--weight_decay', type=float, default=0.0, help="Weight decay.")
-    parser.add_argument('--num_train_epochs', type=int, default=3, help="Number of training epochs.")
-    parser.add_argument('--warmup_ratio', type=float, default=0.0, help="Warmup ratio.")
-    parser.add_argument('--seed', type=int, default=42, help="Random seed.")
-    parser.add_argument('--batch_size', type=int, default=8, help="Total batch size.")
-    parser.add_argument('--wandb_run_name', type=str, default="run", help="WandB run name.")
-    
+    parser = argparse.ArgumentParser(description="Train K-COMP model.")
+    parser.add_argument("--train_data", type=str, required=True, help="Path to the training data.")
+    parser.add_argument("--eval_data", type=str, required=True, help="Path to the evaluation data.")
+    parser.add_argument("--output_dir", type=str, required=True, help="Path to the output directory.")
+    parser.add_argument("--model_id", type=str, required=True, help="Pretrained model identifier.")
+    parser.add_argument("--per_device_train_batch_size", type=int, default=1)
+    parser.add_argument("--per_device_eval_batch_size", type=int, default=1)
+    parser.add_argument("--learning_rate", type=float, default=5e-5)
+    parser.add_argument("--lr_scheduler_type", type=str, default="linear")
+    parser.add_argument("--weight_decay", type=float, default=0.0)
+    parser.add_argument("--num_train_epochs", type=int, default=3)
+    parser.add_argument("--warmup_ratio", type=float, default=0.0)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--batch_size", type=int, default=8, help="Total effective batch size.")
+    parser.add_argument("--wandb_run_name", type=str, default="run")
+
     args = parser.parse_args()
     main(args)
