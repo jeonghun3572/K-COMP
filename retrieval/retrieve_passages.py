@@ -142,13 +142,11 @@ if __name__ == "__main__":
     parser.add_argument("--n_docs", type=int, default=10, help="Number of documents to retrieve per query")
     parser.add_argument("--per_gpu_batch_size", type=int, default=64, help="Batch size for question encoding")
     parser.add_argument("--model_name_or_path", type=str, required=True, help="Path to the retriever model")
-    parser.add_argument("--no_fp16", action="store_true", help="Inference in fp32")
     parser.add_argument("--question_maxlength", type=int, default=512, help="Maximum tokens per question")
     parser.add_argument("--indexing_batch_size", type=int, default=1000000, help="Batch size for indexing passages")
     parser.add_argument("--projection_size", type=int, default=768, help="Embedding projection dimension")
     parser.add_argument("--n_subquantizers", type=int, default=0, help="Number of subquantizers (0 = flat index)")
     parser.add_argument("--n_bits", type=int, default=8, help="Number of bits per subquantizer")
-    parser.add_argument("--dataset", type=str, default="none")
     parser.add_argument("--lowercase", action="store_true", help="Lowercase text before encoding")
     parser.add_argument("--normalize_text", action="store_true", help="Normalize text before encoding")
 

@@ -2,7 +2,7 @@
 # Step 2: Training
 # Run from the project root directory.
 
-accelerate launch \
+uv run accelerate launch \
     --main_process_port <PORT> \
     --num_processes <NUM_GPUS> \
     --num_machines 1 \

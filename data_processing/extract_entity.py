@@ -38,7 +38,7 @@ def filter_entities(entities, passage):
 def main(args):
     stop_words_list = [word.lower() for word in STOP_WORDS]
     wlem = nltk.WordNetLemmatizer()
-    spacy.require_gpu(0)
+    spacy.prefer_gpu()
     nlp = spacy.load("en_core_sci_scibert")
 
     total = []

@@ -128,7 +128,7 @@ class WikiPageProcessor:
 
         try:
             first_sent = str([i for i in self.nlp(first_parag).sents][0])
-        except:
+        except Exception:
             print(title, first_parag)
             first_sent = ""
         first_sent_clean, _ = self.cleaner.remove_links(first_sent)

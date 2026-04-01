@@ -92,17 +92,7 @@ def init_distributed_mode(params):
     # initialize multi-GPU
     if is_distributed:
 
-        # http://pytorch.apachecn.org/en/0.3.0/distributed.html#environment-variable-initialization
-        # 'env://' will read these environment variables:
-        # MASTER_PORT - required; has to be a free port on machine with rank 0
-        # MASTER_ADDR - required (except for rank 0); address of rank 0 node
-        # WORLD_SIZE - required; can be set either here, or in a call to init function
-        # RANK - required; can be set either here, or in a call to init function
-
-        #print("Initializing PyTorch distributed ...")
         torch.distributed.init_process_group(
             init_method='env://',
             backend='nccl',
-            #world_size=params.world_size,
-            #rank=params.global_rank,
         )

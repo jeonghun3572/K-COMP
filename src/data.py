@@ -106,8 +106,7 @@ class Collator:
 
 def load_passages(path):
     if not os.path.exists(path):
-        logger.info(f"{path} does not exist")
-        return
+        raise FileNotFoundError(f"Passages file not found: {path}")
     logger.info(f"Loading passages from: {path}")
 
     passages = []

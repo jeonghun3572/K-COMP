@@ -95,7 +95,6 @@ if __name__ == "__main__":
     parser.add_argument("--per_gpu_batch_size", type=int, default=512, help="Batch size for encoding")
     parser.add_argument("--passage_maxlength", type=int, default=512, help="Maximum number of tokens per passage")
     parser.add_argument("--model_name_or_path", type=str, required=True, help="Path to the retriever model")
-    parser.add_argument("--no_fp16", action="store_true", help="Inference in fp32")
     parser.add_argument("--no_title", action="store_true", help="Do not prepend title to passage text")
     parser.add_argument("--lowercase", action="store_true", help="Lowercase text before encoding")
     parser.add_argument("--normalize_text", action="store_true", help="Normalize text before encoding")

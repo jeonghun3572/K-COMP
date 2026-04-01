@@ -288,14 +288,14 @@ if __name__ == "__main__":
     argparser = argparse.ArgumentParser()
     argparser.add_argument(
         "--data_folder",
-        default="/dev/shm/data/wiki",
         type=str,
-        help="The path to the folder for data")
+        required=True,
+        help="Path to the folder containing articles.json and short_descriptions.json")
     argparser.add_argument(
         "--threads",
         default=32,
         type=int,
-        help="The path to the folder for data")
+        help="Number of threads for multiprocessing")
     argparser.add_argument(
         "--val_samples",
         default=1000,
@@ -319,19 +319,14 @@ if __name__ == "__main__":
             wike_lines, desc_lines, sep="==", threads=args.threads, tqdm_enabled=True
         )
 
-        out_records = open(os.path.join(args.data_folder, "first_paragraphs_filter.json"), "w")
-        out_desc_records = open(os.path.join(args.data_folder, "short_descriptions_filter.json"), "w")
-
-        for record in wiki_para_samples:
-            json.dump(record, out_records)
-            out_records.write('\n')
-        
-        for record in desc_samples:
-            json.dump(record, out_desc_records)
-            out_desc_records.write('\n')
-
-        out_records.close()
-        out_desc_records.close()
+        with open(os.path.join(args.data_folder, "first_paragraphs_filter.json"), "w") as out_records, \
+             open(os.path.join(args.data_folder, "short_descriptions_filter.json"), "w") as out_desc_records:
+            for record in wiki_para_samples:
+                json.dump(record, out_records)
+                out_records.write('\n')
+            for record in desc_samples:
+                json.dump(record, out_desc_records)
+                out_desc_records.write('\n')
     elif args.task == "filter:doc":
         with open(os.path.join(args.data_folder, "articles.json"), "r") as f:
             wike_lines = f.readlines()
@@ -343,13 +338,10 @@ if __name__ == "__main__":
             wike_lines, desc_lines, threads=args.threads, tqdm_enabled=True
         )
 
-        out_records = open(os.path.join(args.data_folder, "paragraphs_filter.json"), "w")
-
-        for record in wiki_para_samples:
-            json.dump(record, out_records)
-            out_records.write('\n')
-        
-        out_records.close()
+        with open(os.path.join(args.data_folder, "paragraphs_filter.json"), "w") as out_records:
+            for record in wiki_para_samples:
+                json.dump(record, out_records)
+                out_records.write('\n')
 
     elif args.task == "split":
         random.seed(0)

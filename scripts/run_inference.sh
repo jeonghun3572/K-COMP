@@ -2,7 +2,7 @@
 # Step 3: Inference
 # Run from the project root directory.
 
-python inference.py \
+uv run python inference.py \
     --model_path <MODEL_PATH> \
     --per_device_test_batch_size <BATCH_SIZE> \
     --dataset <DATASET_NAME> \

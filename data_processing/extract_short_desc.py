@@ -35,10 +35,9 @@ class WikiXmlShortDescRetriever:
         last_shown_num_processed_pages = 0
 
         # Iteratively process wikipedia bz2 dump file and get a tuple of (title, text). This "text" is raw
-        for line in subprocess.Popen(
-                ['bzcat'],
-                stdin=open(self.wiki_xml_file),
-                stdout=subprocess.PIPE).stdout:
+        with open(self.wiki_xml_file, "rb") as wiki_f:
+            proc = subprocess.Popen(['bzcat'], stdin=wiki_f, stdout=subprocess.PIPE)
+        for line in proc.stdout:
 
             parser.feed(line)
             # If the last element added is redirect, drop it
@@ -95,9 +94,10 @@ if __name__ == '__main__':
         help="Maximum number of Wikipedia articles to process")
     argparser.add_argument(
         "--out_dir",
-        default=False,
+        default=None,
         type=str,
-        help="Directory where the output should be saved"
+        required=True,
+        help="Directory where the output files (articles.json, short_desc.json) should be saved"
     )
     args = argparser.parse_args()
 

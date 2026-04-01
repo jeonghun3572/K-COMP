@@ -1,10 +1,13 @@
 import os
 import pickle
+import logging
 from typing import List, Tuple
 
 import faiss
 import numpy as np
 from tqdm import tqdm
+
+logger = logging.getLogger(__name__)
 
 
 class Indexer:
@@ -21,7 +24,7 @@ class Indexer:
         if not self.index.is_trained:
             self.index.train(embeddings)
         self.index.add(embeddings)
-        print(f"Total data indexed {len(self.index_id_to_db_id)}")
+        logger.info(f"Total data indexed {len(self.index_id_to_db_id)}")
 
     def search_knn(
         self,
@@ -47,7 +50,7 @@ class Indexer:
     def serialize(self, dir_path):
         index_file = os.path.join(dir_path, "index.faiss")
         meta_file = os.path.join(dir_path, "index_meta.faiss")
-        print(f"Serializing index to {index_file}, meta data to {meta_file}")
+        logger.info(f"Serializing index to {index_file}, meta data to {meta_file}")
 
         faiss.write_index(self.index, index_file)
         with open(meta_file, mode="wb") as f:
@@ -56,10 +59,10 @@ class Indexer:
     def deserialize_from(self, dir_path):
         index_file = os.path.join(dir_path, "index.faiss")
         meta_file = os.path.join(dir_path, "index_meta.faiss")
-        print(f"Loading index from {index_file}, meta data from {meta_file}")
+        logger.info(f"Loading index from {index_file}, meta data from {meta_file}")
 
         self.index = faiss.read_index(index_file)
-        print(f"Loaded index of type {type(self.index)} and size {self.index.ntotal}")
+        logger.info(f"Loaded index of type {type(self.index)} and size {self.index.ntotal}")
 
         with open(meta_file, "rb") as reader:
             self.index_id_to_db_id = pickle.load(reader)

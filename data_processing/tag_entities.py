@@ -1,7 +1,9 @@
-import pandas as pd
+import os
 import json
-import parmap
 import argparse
+
+import parmap
+import pandas as pd
 
 
 def my_task(chunks):
@@ -57,7 +59,7 @@ def main(args):
     with open(args.input_path, encoding="utf-8") as f:
         json_data = json.load(f)
 
-    num_cores = 55
+    num_cores = args.num_workers
     json_chunks = [json_data[i::num_cores] for i in range(num_cores)]
     chunks = [(chunk, df) for chunk in json_chunks]
 
@@ -70,9 +72,10 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process some data.")
-    parser.add_argument('--desc_data_wiki', type=str, required=True, help='Path to the wiki description data')
-    parser.add_argument('--desc_data_med', type=str, required=True, help='Path to the medical description data')
+    parser.add_argument('--desc_data_wiki', type=str, required=True, help='Path to the Wikipedia description data (JSON)')
+    parser.add_argument('--desc_data_med', type=str, required=True, help='Path to the medical description data (JSON)')
     parser.add_argument('--input_path', type=str, required=True, help='Path to the input JSON file')
     parser.add_argument('--output_path', type=str, required=True, help='Path to the output JSON file')
+    parser.add_argument('--num_workers', type=int, default=os.cpu_count(), help='Number of parallel workers (default: all CPUs)')
     args = parser.parse_args()
     main(args)
