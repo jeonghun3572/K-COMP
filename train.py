@@ -76,7 +76,7 @@ def main(args):
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         formatting_func=formatting_prompts_func,
         callbacks=[EarlyStoppingCallback(early_stopping_patience=2)],
     )

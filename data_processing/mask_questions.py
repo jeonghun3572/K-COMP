@@ -35,13 +35,10 @@ def process_data(input_path, output_path):
                 question_include_entity = pat.sub(r"\1", question_include_entity)
             temp['question_include_entity'] = question_include_entity
 
-            ## Make dataset for question masking
-            try:
-                temp["prompt"] = f"### Question\n{data['question_include_entity']}\n\n### Passage\n{data['passage']}"
-                temp["completion"] = f"### Entity\n{data['description']}\n\n### Summary\n{data['summary']}"
-            except:
-                temp["prompt"] = f"### Question\n{data['question']}\n\n### Passage\n{data['passage']}"
-                temp["completion"] = f"### Entity\nNone\n\n### Summary\n{data['summary']}"
+            description = data.get('description', 'None')
+            summary = data.get('summary', '')
+            temp["prompt"] = f"### Question\n{question_include_entity}\n\n### Passage\n{data['passage']}"
+            temp["completion"] = f"### Entity\n{description}\n\n### Summary\n{summary}"
             total.append(temp)
 
     with open(output_path, 'w', encoding="UTF-8") as f:
