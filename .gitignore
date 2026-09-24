@@ -1,0 +1,4 @@
+legacy_code/
+__pycache__/
+*.pyc
+wandb/

@@ -1,10 +1,10 @@
-import json
 import re
-import os
+import json
 import argparse
 
-def process_data(input_path, output_path):
-    with open(input_path) as f:
+
+def main(args):
+    with open(args.input_path) as f:
         json_data = json.load(f)
 
     total = []
@@ -35,28 +35,21 @@ def process_data(input_path, output_path):
                 question_include_entity = pat.sub(r"\1", question_include_entity)
             temp['question_include_entity'] = question_include_entity
 
-            ## Make dataset for question masking
             try:
                 temp["prompt"] = f"### Question\n{data['question_include_entity']}\n\n### Passage\n{data['passage']}"
                 temp["completion"] = f"### Entity\n{data['description']}\n\n### Summary\n{data['summary']}"
-            except:
+            except KeyError:
                 temp["prompt"] = f"### Question\n{data['question']}\n\n### Passage\n{data['passage']}"
                 temp["completion"] = f"### Entity\nNone\n\n### Summary\n{data['summary']}"
             total.append(temp)
 
-    with open(output_path, 'w', encoding="UTF-8") as f:
+    with open(args.output_path, 'w', encoding="UTF-8") as f:
         json.dump(total, f, indent=2, ensure_ascii=False)
 
-def main():
-    parser = argparse.ArgumentParser(description="Process JSON data.")
-    parser.add_argument('input_path', type=str, help="Path to the input JSON file.")
-    parser.add_argument('output_path', type=str, help="Path to the output JSON file.")
-    args = parser.parse_args()
-
-    if os.path.exists(args.input_path):
-        process_data(args.input_path, args.output_path)
-    else:
-        print(f"Input file {args.input_path} does not exist.")
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input-path', type=str, required=True, help="Path to the input JSON file.")
+    parser.add_argument('--output-path', type=str, required=True, help="Path to the output JSON file.")
+    args = parser.parse_args()
+    main(args)

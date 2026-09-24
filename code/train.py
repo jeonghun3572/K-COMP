@@ -62,7 +62,7 @@ def main(args):
         report_to="wandb",
         save_only_model=True,
         ddp_find_unused_parameters=False,
-        max_seq_length=8192,
+        max_seq_length=args.max_seq_length,
     )
 
     trainer = SFTTrainer(
@@ -70,31 +70,34 @@ def main(args):
         args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         formatting_func=formatting_prompts_func,
-        callbacks=[EarlyStoppingCallback(early_stopping_patience=2)],
+        callbacks=[EarlyStoppingCallback(early_stopping_patience=args.early_stopping_patience)],
     )
 
     trainer.train()
     trainer.model.save_pretrained(args.output_dir)
+    tokenizer.save_pretrained(args.output_dir)
     wandb.finish()
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Train a model.")
-    parser.add_argument('--train_data', type=str, required=True, help="Path to the training data.")
-    parser.add_argument('--eval_data', type=str, required=True, help="Path to the evaluation data.")
-    parser.add_argument('--output_dir', type=str, required=True, help="Path to the output directory.")
-    parser.add_argument('--model_id', type=str, required=True, help="Model ID.")
-    parser.add_argument('--per_device_train_batch_size', type=int, default=1, help="Batch size per device for training.")
-    parser.add_argument('--per_device_eval_batch_size', type=int, default=1, help="Batch size per device for evaluation.")
-    parser.add_argument('--learning_rate', type=float, default=5e-5, help="Learning rate.")
-    parser.add_argument('--lr_scheduler_type', type=str, default="linear", help="Learning rate scheduler type.")
-    parser.add_argument('--weight_decay', type=float, default=0.0, help="Weight decay.")
-    parser.add_argument('--num_train_epochs', type=int, default=3, help="Number of training epochs.")
-    parser.add_argument('--warmup_ratio', type=float, default=0.0, help="Warmup ratio.")
+    parser.add_argument('--train-data', type=str, required=True, help="Path to the training data.")
+    parser.add_argument('--eval-data', type=str, required=True, help="Path to the evaluation data.")
+    parser.add_argument('--output-dir', type=str, required=True, help="Path to the output directory.")
+    parser.add_argument('--model-id', type=str, required=True, help="Model ID.")
+    parser.add_argument('--per-device-train-batch-size', type=int, default=1, help="Batch size per device for training.")
+    parser.add_argument('--per-device-eval-batch-size', type=int, default=1, help="Batch size per device for evaluation.")
+    parser.add_argument('--learning-rate', type=float, default=5e-5, help="Learning rate.")
+    parser.add_argument('--lr-scheduler-type', type=str, default="linear", help="Learning rate scheduler type.")
+    parser.add_argument('--weight-decay', type=float, default=0.0, help="Weight decay.")
+    parser.add_argument('--num-train-epochs', type=int, default=3, help="Number of training epochs.")
+    parser.add_argument('--warmup-ratio', type=float, default=0.0, help="Warmup ratio.")
     parser.add_argument('--seed', type=int, default=42, help="Random seed.")
-    parser.add_argument('--batch_size', type=int, default=8, help="Total batch size.")
-    parser.add_argument('--wandb_run_name', type=str, default="run", help="WandB run name.")
-    
+    parser.add_argument('--batch-size', type=int, default=8, help="Total batch size.")
+    parser.add_argument('--max-seq-length', type=int, default=8192, help="Maximum sequence length.")
+    parser.add_argument('--early-stopping-patience', type=int, default=2, help="Early stopping patience.")
+    parser.add_argument('--wandb-run-name', type=str, default="run", help="WandB run name.")
+
     args = parser.parse_args()
     main(args)

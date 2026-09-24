@@ -30,15 +30,15 @@ Download the retrieval corpus:
 After correctly setting the configuration, such as the downloaded data and corpus path, run the scripts below sequentially.
 ```
 cd script
-bash 0_retrieval.sh
-bash 1_data_process.sh
+bash retrieval.sh
+bash data_process.sh
 ```
 After data processing, dataset should contain `prompt` and `completion`.
 
 ## Train & Inference
 ```
-bash 2_train.sh
-bash 3_inference.sh
+bash train.sh
+bash inference.sh
 ```
 
 ## Cite

@@ -3,7 +3,6 @@ import mwparserfromhell
 import re
 import signal
 import spacy
-from wikimapper import WikiMapper
 import xml.sax
 
 generic_title_start = ["Category:", "File:", "Template:", "Draft:", "Wikipedia:"]
@@ -26,52 +25,6 @@ def time_limit(seconds):
         signal.alarm(0)
 
 
-class WikiTitleIdResolver:
-    def __init__(self, wiki_db):
-        """
-        This class uses the WikiMapper python package
-        :param wiki_db: Address to the Wikipedia index. Follow the instructions at
-            https://github.com/jcklie/wikimapper#create-your-own-index to create this
-            index
-        """
-        self.mapper = WikiMapper(wiki_db)
-
-    def title2id(self, title):
-        """
-        Give a Wikipedia page title return the ID
-        """
-        return self.mapper.title_to_id(title)
-
-    def id2title(self, id):
-        """
-        Given the ID of a Wikipedia page return the page title
-        """
-        return self.mapper.id_to_title(id)
-
-    @staticmethod
-    def surface2title(surface_form):
-        """
-        Turn surface form to page title. For instance in
-
-            "marked the end of the [[classical era of anarchism]]. In the last"
-
-        turn "classical era of anarchism" to "Classical_era_of_anarchism". Rules
-        of this function come from two places:
-
-        1) https://en.wikipedia.org/wiki/Help:Link where it says:
-            "The link target is case-sensitive except for the first character
-            (so [[atom]] links to "Atom" but [[ATom]] does not)."
-
-        2) https://en.wikipedia.org/wiki/Wikipedia:Page_name where it says:
-            "some translation occurs, such as spaces are replaced with underscores"
-
-        :param surface_form: Surface form of a Wikipedia link
-        :return: Page title associated with the surface form
-        """
-        surface_form = surface_form.capitalize()
-        return "_".join(surface_form.split())
-
-
 class WikiXmlHandler(xml.sax.handler.ContentHandler):
     """Content handler for Wiki XML data using SAX"""
 
@@ -81,8 +34,6 @@ class WikiXmlHandler(xml.sax.handler.ContentHandler):
         self._values = {}
         self._current_tag = None
         self.pages = []
-        self.cleaner = Cleaner()
-        self.nlp = spacy.load('en_core_web_sm')
 
     def characters(self, content):
         """Characters between opening and closing tags"""
@@ -173,7 +124,7 @@ class WikiPageProcessor:
         for l in text.splitlines():
             line = l.strip()
             for ex in exclude_sections:
-                pat = re.compile("=+\s*" + ex + "\s*=+")
+                pat = re.compile(r"=+\s*" + ex + r"\s*=+")
                 if re.match(pat, line.lower()):
                     skip = True  # replace with break if this is the last section
                     continue
@@ -188,7 +139,7 @@ class WikiPageProcessor:
         """
         Remove the patter [[abc:xyz]]
         """
-        pat = "\[\[(.*?):(.*?)]]"
+        pat = r"\[\[(.*?):(.*?)]]"
         text = re.sub(pat, '', str(text))
         return text
 
@@ -197,7 +148,7 @@ class WikiPageProcessor:
         """
         Remove everything inside {} and <>
         """
-        pat_lt_gt = re.compile("&lt;\s*(.*?)\s*&gt;")
+        pat_lt_gt = re.compile(r"&lt;\s*(.*?)\s*&gt;")
         text = re.sub(pat_lt_gt, "", text)
 
         out = ''
@@ -224,7 +175,7 @@ class WikiPageProcessor:
                 i += 1
 
         # Remove "[http:xyz.com link to the address]"
-        link_pat = re.compile("\[\s*http(.*?):(.*?)]")
+        link_pat = re.compile(r"\[\s*http(.*?):(.*?)]")
         out = re.sub(link_pat, "", out)
         return out
 

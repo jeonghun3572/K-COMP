@@ -1,7 +1,6 @@
 import os
 import re
 import json
-import random
 import argparse
 from tqdm import tqdm
 from collections import defaultdict
@@ -32,18 +31,6 @@ def get_first_para(example, sep="=="):
 
     text = data["text"]
     para_sample["text"] = text.split(sep)[0].strip()
-
-    return para_sample
-
-
-def parse_para(example):
-    data = json.loads(example)
-    para_sample = {
-        "title": data["title"],
-        "short_description": data["short_description"],
-        "first_sentence": data["first_sentence"],
-        "text": data["text"]
-    }
 
     return para_sample
 
@@ -135,28 +122,6 @@ def filter_para(text):
     if len(re.findall(r"\[\[.*?in aviation.*?\]\]", text)) > 0:
         return True
 
-    return False
-
-
-def filter_doc(text):
-    """
-    Filter out noisy documents with hard-coded rules.
-    """
-    # if the article content is missing
-    if len(text) == 0:
-        return True
-
-    # if there's redirect information
-    if text.lower().startswith("redirect"):
-        return True
-
-    # if the article is not well-cleaned-up
-    if "File:" in text or "http:" in text or "https:" in text or "Image:" in text:
-        return True
-
-    # if there's any special case
-    if len(re.findall(r"\[\[.*?in aviation.*?\]\]", text)) > 0:
-        return True
     return False
 
 
@@ -263,136 +228,36 @@ def proc_data_samples(examples, desc_samples, sep="==", threads=1, tqdm_enabled=
     return filter_samples(wiki_para_samples, desc_samples)
 
 
-def proc_data_samples_doc(examples, desc_samples, threads=1, tqdm_enabled=True):
-    """
-    Process data samples for the entire Wikipedia
-    """
-    threads = min(threads, cpu_count())
-    with Pool(threads) as p:
-        annotate_ = partial(
-            parse_para,
-            )
-        wiki_para_samples = list(
-            tqdm(
-                p.imap(annotate_, examples, chunksize=32),
-                total=len(examples),
-                desc="Parse wikipedia articles",
-                disable=not tqdm_enabled,
-            )
-        )
+def main(args):
+    with open(os.path.join(args.data_folder, "articles.json"), "r") as f:
+        wike_lines = f.readlines()
 
-    return filter_samples(wiki_para_samples, desc_samples)
+    with open(os.path.join(args.data_folder, "short_descriptions.json"), "r") as f:
+        desc_lines = f.readlines()
+
+    wiki_para_samples, desc_samples = proc_data_samples(
+        wike_lines, desc_lines, sep="==", threads=args.threads, tqdm_enabled=True
+    )
+
+    with open(os.path.join(args.data_folder, "first_paragraphs_filter.json"), "w") as f:
+        for record in wiki_para_samples:
+            json.dump(record, f)
+            f.write('\n')
+
+    with open(os.path.join(args.data_folder, "short_descriptions_filter.json"), "w") as f:
+        for record in desc_samples:
+            json.dump(record, f)
+            f.write('\n')
+
+    # Description format used by entity_tag.py
+    desc_list = [{"title": k, "description": v} for record in desc_samples for k, v in record.items()]
+    with open(os.path.join(args.data_folder, "short_descriptions_wiki.json"), "w", encoding="utf-8") as f:
+        json.dump(desc_list, f, indent=2, ensure_ascii=False)
 
 
 if __name__ == "__main__":
-    argparser = argparse.ArgumentParser()
-    argparser.add_argument(
-        "--data_folder",
-        default="/dev/shm/data/wiki",
-        type=str,
-        help="The path to the folder for data")
-    argparser.add_argument(
-        "--threads",
-        default=32,
-        type=int,
-        help="The path to the folder for data")
-    argparser.add_argument(
-        "--val_samples",
-        default=1000,
-        type=int,
-        help="Number of samples in the validation set")
-    argparser.add_argument(
-        "--task",
-        default="filter",
-        type=str,
-        help="The preprocessing task {filter, split}")
-    args = argparser.parse_args()
-
-    if args.task == "filter":
-        with open(os.path.join(args.data_folder, "articles.json"), "r") as f:
-            wike_lines = f.readlines()
-        
-        with open(os.path.join(args.data_folder, "short_descriptions.json"), "r") as f:
-            desc_lines = f.readlines()
-        
-        wiki_para_samples, desc_samples = proc_data_samples(
-            wike_lines, desc_lines, sep="==", threads=args.threads, tqdm_enabled=True
-        )
-
-        out_records = open(os.path.join(args.data_folder, "first_paragraphs_filter.json"), "w")
-        out_desc_records = open(os.path.join(args.data_folder, "short_descriptions_filter.json"), "w")
-
-        for record in wiki_para_samples:
-            json.dump(record, out_records)
-            out_records.write('\n')
-        
-        for record in desc_samples:
-            json.dump(record, out_desc_records)
-            out_desc_records.write('\n')
-
-        out_records.close()
-        out_desc_records.close()
-    elif args.task == "filter:doc":
-        with open(os.path.join(args.data_folder, "articles.json"), "r") as f:
-            wike_lines = f.readlines()
-        
-        with open(os.path.join(args.data_folder, "short_descriptions_filter.json"), "r") as f:
-            desc_lines = f.readlines()
-        
-        wiki_para_samples, desc_samples = proc_data_samples_doc(
-            wike_lines, desc_lines, threads=args.threads, tqdm_enabled=True
-        )
-
-        out_records = open(os.path.join(args.data_folder, "paragraphs_filter.json"), "w")
-
-        for record in wiki_para_samples:
-            json.dump(record, out_records)
-            out_records.write('\n')
-        
-        out_records.close()
-
-    elif args.task == "split":
-        random.seed(0)
-        with open(os.path.join(args.data_folder, "first_paragraphs_filter.json"), "r") as f:
-            wike_lines = f.readlines()
-        
-        random.shuffle(wike_lines)
-        train_split = wike_lines[args.val_samples:]
-        val_unseen_split = wike_lines[:args.val_samples]
-        val_seen_split = train_split[:args.val_samples]
-
-        with open(os.path.join(args.data_folder, "first_paragraphs_filter_train.json"), "w") as f:
-            for line in train_split:
-                f.write(line)
-        
-        with open(os.path.join(args.data_folder, "first_paragraphs_filter_valid_seen.json"), "w") as f:
-            for line in val_seen_split:
-                f.write(line)
-        
-        with open(os.path.join(args.data_folder, "first_paragraphs_filter_valid_unseen.json"), "w") as f:
-            for line in val_unseen_split:
-                f.write(line)
-
-    elif args.task == "split:doc":
-        random.seed(0)
-        with open(os.path.join(args.data_folder, "paragraphs_filter.json"), "r") as f:
-            wike_lines = f.readlines()
-        
-        random.shuffle(wike_lines)
-        train_split = wike_lines[args.val_samples:]
-        val_unseen_split = wike_lines[:args.val_samples]
-        val_seen_split = train_split[:args.val_samples]
-
-        with open(os.path.join(args.data_folder, "paragraphs_filter_train.json"), "w") as f:
-            for line in train_split:
-                f.write(line)
-        
-        with open(os.path.join(args.data_folder, "paragraphs_filter_valid_seen.json"), "w") as f:
-            for line in val_seen_split:
-                f.write(line)
-        
-        with open(os.path.join(args.data_folder, "paragraphs_filter_valid_unseen.json"), "w") as f:
-            for line in val_unseen_split:
-                f.write(line)
-    else:
-        raise NotImplementedError("The `task` argument should get one of `filter`, `filter:doc`, `split`, `split:doc`")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data-folder", type=str, default="/dev/shm/data/wiki", help="The path to the folder for data")
+    parser.add_argument("--threads", type=int, default=32, help="Number of processes")
+    args = parser.parse_args()
+    main(args)
